@@ -10,49 +10,39 @@ To make it more easy to understand, it was not possible for OpenDNSSEC users to 
 OpenSSL cryptographic libraries can be used with the SoftHSM project. I recommend to configured your LinuxONE or IBM Z Linux host with the following guidance [here](https://github.com/guikarai/PE-LinuxONE/blob/master/index.md) in order to be sure that your OpenSSL is backed up with ibmca engine in order to get access to hardware crypto acceleration. Limit yourself to the first chapter about OpenSSL, dm-crypt is not required for the following.
 
 ### Installing SoftHSM
-SoftHSM is available from the OpenDNSSEC website, and it can be download using the wget command in the following way.
-’’’
-blockchain@blkchn30:~$ sudo wget https://dist.opendnssec.org/source/softhsm-2.3.0.tar.gz
-’’’
-When download complete, extract the package using the tar command:
-blockchain@blkchn30:~$ sudo tar -xzf softhsm-2.3.0.tar.gz
+SoftHSM is available from the OpenDNSSEC website, or can be installed thans to the following command:
+```
+blockchain@blkchn30:~$ sudo apt-get install softhsm2-util softhsm2-common
+```
 
-Move in the SoftHSM repository using the cd command:
-blockchain@blkchn30:~$ cd softhsm-2.3.0/
-
-Now, run the configure script to check dependencies of the SoftHSM software.
-
-blockchain@blkchn30:~/softhsm-2.3.0$ sudo ./configure
-
-Run the make command to compile the source code of SoftHSM.
-
-blockchain@blkchn30:~/softhsm-2.3.0$ sudo make
-
-Next, run "make install command" to install the SoftHSM tool.
-
-blockchain@blkchn30:~/softhsm-2.3.0$ sudo make install
-
-
-Configure SoftHSM
-Let’s identity together the default location of the config file is /etc/softhsm2.conf. Please issue the following command:
+### Configure SoftHSM
+Let’s identity together where is the the default location of the config file softhsm2.conf. Please issue the following command:
+```
 blockchain@blkchn30:~$ sudo find / -name softhsm2.conf
 /etc/softhsm/softhsm2.conf
 /usr/share/softhsm/softhsm2.conf
+```
 
-Let’s set the SOFTHSM2_CONF environment variable thanks to the following command:
-
+Let’s now set the SOFTHSM2_CONF environment variable, reusing output of the preceding command. Please issue the following command:
+```
 blockchain@blkchn30:~$ export SOFTHSM2_CONF=/etc/softhsm/softhsm2.conf
+```
 
 Now, let’s create the token repository folder, please issue the following command:
+```
 blockchain@blkchn30:~$ mkdir /var/lib/softhsm/tokens/
+```
 
 Let’s locate the softhsm pkcs11 library. This will be required for later. Please issue the following command:
+```
 blockchain@blkchn30:~$ sudo find / -name libsofthsm2.so
 /usr/lib/softhsm/libsofthsm2.so
+```
 
-Initialize Soft Token
+### Initialize Soft Token
 The very first step to use SoftHSM is to use initialize it. We can use the "softhsm2-util" or the "PKCS#11" interface to initialize the device. The following snapshot shows the initialization of the SoftHSM device.
 
+```
 blockchain@blkchn30:~$ sudo softhsm2-util --init-token --slot 0 --label « ForFabric »
 === SO PIN (4-255 characters) ===
 Please enter SO PIN: ********				#12345678
@@ -61,10 +51,12 @@ Please reenter SO PIN: ********			#12345678
 Please enter user PIN: ********			#87654321
 Please reenter user PIN: ********			#87654321
 The token has been initialized.
+```
 
 The Security Officer (SO) PIN is used to re-initialize the token and the user PIN is handed out to the application so it can interact with the token (like usage with Mozilla Firefox). That's why, set both SO and user PIN. Once a token has been initialized, more slots will be added automatically to a new uninitialized token. Initialized tokens will be reassigned to another slot based on the token serial number. It is recommended to find and interact with the token by searching for the token label or serial number in the slot list/token info.
 
 Let’s check what the freshly created token looks like:
+```
 blockchain@blkchn30:~$ sudo softhsm2-util --show-slots
 Available slots:
 Slot 253912107
@@ -83,6 +75,7 @@ Slot 253912107
         Initialized:      yes
         User PIN init.:   yes
         Label:            ForFabric
+```
 
 ### Hyperledger Fabric, FABRIC CA, HSM and PKCS11
 
@@ -96,7 +89,7 @@ You can use both the config file and environment variables to configure BCCSP Fo
 Please issue the following command:
 
 vi 
-
+```
 #############################################################################
 # BCCSP (BlockChain Crypto Service Provider) section is used to select which
 # crypto library implementation to use
@@ -112,13 +105,14 @@ bccsp:
     filekeystore:
       # The directory used for the software file-based keystore
       keystore: msp/keystore
+```
 
 And you can override relevant fields via environment variables as follows:
+    
 FABRIC_CA_SERVER_BCCSP_DEFAULT=PKCS11
-FABRIC_CA_SERVER_BCCSP_PKCS11_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
-FABRIC_CA_SERVER_BCCSP_PKCS11_PIN=87654321
-FABRIC_CA_SERVER_BCCSP_PKCS11_LABEL=ForFabric
-
+FABRIC_CA_SERVER_BCCSP_PKCS11_LIBRARY=/usr/lib/softhsm/libsofthsm2.so   #It refer instruction from above
+FABRIC_CA_SERVER_BCCSP_PKCS11_PIN=87654321                              #It refer instruction from above
+FABRIC_CA_SERVER_BCCSP_PKCS11_LABEL=ForFabric                           #It refer instruction from above
 
 
 You are done.
