@@ -33,29 +33,35 @@ Now, let’s create the token repository folder, please issue the following comm
 blockchain@blkchn30:~$ mkdir /var/lib/softhsm/tokens/
 ```
 
-Let’s locate the softhsm pkcs11 library. This will be required for later. Please issue the following command:
+Let’s locate the softhsm pkcs11 library. This will be required later. Please issue the following command:
 ```
 blockchain@blkchn30:~$ sudo find / -name libsofthsm2.so
 /usr/lib/softhsm/libsofthsm2.so
 ```
 
 ### Initialize Soft Token
-The very first step to use SoftHSM is to use initialize it. We can use the "softhsm2-util" or the "PKCS#11" interface to initialize the device. The following snapshot shows the initialization of the SoftHSM device.
+The very first step to use SoftHSM is to use initialize it. We can use the "softhsm2-util" interface to initialize the device. Please procede as follow.
 
 ```
 blockchain@blkchn30:~$ sudo softhsm2-util --init-token --slot 0 --label « ForFabric »
 === SO PIN (4-255 characters) ===
-Please enter SO PIN: ********				#12345678
-Please reenter SO PIN: ********			#12345678
+Please enter SO PIN: ********				#eg. 12345678
+Please reenter SO PIN: ********			    #eg. 12345678
 === User PIN (4-255 characters) ===
-Please enter user PIN: ********			#87654321
-Please reenter user PIN: ********			#87654321
+Please enter user PIN: ********			    #eg. 87654321
+Please reenter user PIN: ********			#eg. 87654321
 The token has been initialized.
 ```
 
-The Security Officer (SO) PIN is used to re-initialize the token and the user PIN is handed out to the application so it can interact with the token (like usage with Mozilla Firefox). That's why, set both SO and user PIN. Once a token has been initialized, more slots will be added automatically to a new uninitialized token. Initialized tokens will be reassigned to another slot based on the token serial number. It is recommended to find and interact with the token by searching for the token label or serial number in the slot list/token info.
+The Security Officer (SO) PIN is used to re-initialize the token and the user PIN is handed out to the application so it can interact with the token. 
 
-Let’s check what the freshly created token looks like:
+That's why, we just set both SO and user PIN. 
+
+Once a token has been initialized, more slots will be added automatically to a new uninitialized token. 
+
+Initialized tokens will be reassigned to another slot based on the token serial number. 
+
+It is recommended to find and interact with the token by searching for the token label or serial number in the slot list/token info. Let’s check what the freshly created token looks like:
 ```
 blockchain@blkchn30:~$ sudo softhsm2-util --show-slots
 Available slots:
@@ -77,12 +83,13 @@ Slot 253912107
         Label:            ForFabric
 ```
 
-### Hyperledger Fabric, FABRIC CA, HSM and PKCS11
+## Hyperledger Fabric, FABRIC CA, HSM and PKCS11
 
-Hardware Security Module (HSM)
-By default, the Fabric CA server and client store private keys in a PEM-encoded file, but they can also be configured to store private keys in an HSM (Hardware Security Module) via PKCS11 APIs. This behavior is configured in the BCCSP (BlockChain Crypto Service Provider) section of the server’s or client’s configuration file.
+### Hardware Security Module (HSM)
+By default, the Fabric CA server and client store private keys in a PEM-encoded file, but they can also be configured to store private keys in an HSM (Hardware Security Module) via PKCS11 APIs. 
+This behavior is configured in the BCCSP (BlockChain Crypto Service Provider) section of the server’s or client’s configuration file.
 
-Configuring Fabric CA server to use softhsm2
+### Configuring Fabric CA server to use softhsm2
 This section shows how to configure the Fabric CA server or client to use a softhsm previously installed and configured.
 We just installed it, and create a token, label it “ForFabric”, set the pin to ‘98765432’ (refer to softhsm documentation).
 You can use both the config file and environment variables to configure BCCSP For example, set the bccsp section of Fabric CA server configuration file as follows.
