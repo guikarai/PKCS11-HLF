@@ -19,8 +19,21 @@ To make it more easy to understand, it was not possible for OpenDNSSEC users to 
 ## Linux on IBM Z / LinuxONE and Hyperledger Fabric
 
 ### Introduction to the Crypto Stack
+The IBM Z and LinuxONE systems provide cryptographic functions that, from an application program perspective, can be grouped as follows:
+* Synchronous cryptographic functions, provided by the CP Assist for Cryptographic Function (CPACF) or the Crypto Express features when defined as an accelerator.
+* Asynchronous cryptographic functions, provided by the Crypto Express features.
 
-### Possible scenario of Hardware Crypto offload
+The IBM Z and LinuxONE systems provide also rich cryptographic functions available via a complete crypto stack made of a set of key crypto APIs.
+![Image of the Crypto Stack](https://github.com/guikarai/PE-LinuxONE/blob/master/images/crypto-stack.png)
+
+### Possible scenarios of Hardware Crypto offload
+We can see 3 path to get access to hardware cryptographic devices:
+* ICA way
+* CCA way
+* EP11 way
+
+You can find here under the easiest one, the ICA way. Note that this is a clear key path and implementation.
+![Image of the Crypto Stack](https://github.com/guikarai/PE-LinuxONE/blob/master/images/crypto-stack.png)
 
 ## Seting up SoftHSM2 to exploit Hardware Crypto and HSM
 
