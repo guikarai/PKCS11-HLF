@@ -1,45 +1,63 @@
-# PKCS11 and HFL LAB
+# PKCS#11 and Hyperledger Fabric LAB on Linux on IBM Z / LinuxONE
 
-## PKCS11 and SOFTHSM2
+## About PKCS#11
 
+### What is PKCS#11?
+In cryptography, PKCS #11 is one of the Public-Key Cryptography Standards, and also refers to the programming interface to create and manipulate cryptographic tokens. (So, it is Public-Key Cryptography Standards rules number #11).
+
+The PKCS #11 standard defines a platform-independent API to cryptographic tokens, such as hardware security modules (HSM) and smart cards, and names the API itself "Cryptoki" (from "cryptographic token interface" and pronounced as "crypto-key" - but "PKCS #11" is often used to refer to the API as well as the standard that defines it).
+
+The API defines most commonly used cryptographic object types (RSA keys, X.509 Certificates, DES/Triple DES keys, etc.) and all the functions needed to use, create/generate, modify and delete those objects.
+
+Most commercial certificate authority software uses PKCS #11 to access the CA signing key or to enroll user certificates. Cross-platform software that needs to use smart cards uses PKCS #11, such as Mozilla Firefox and OpenSSL (using an extension). It is also used to access smart cards and HSMs.
+
+### SOFTHSM2, a PKCS#11 store
 SoftHSM is basically an implementation of a cryptographic store accessible through a PKCS #11 interface. The PKCS#11 interface is used to communicate or access the cryptographic devices such as HSM (Hardware Security Modules) and smart cards. The primary purpose of HSM devices is to generate cryptographic keys and sign/encrypt information without revealing the private key to the others.
 
 To make it more easy to understand, it was not possible for OpenDNSSEC users to buy new hardware token for the storage of cryptographic keys. So, to counter this issue, OpenDNSSEC started providing "SoftHSM", a software implementation of a generic cryptographic device with a PKCS#11 interface. SoftHSM is designed to meet the requirements of OpenDNSSEC and also work with other cryptographic products. 
 
-### Installing Dependencies
+## Linux on IBM Z / LinuxONE and Hyperledger Fabric
+
+### Introduction to the Crypto Stack
+
+### Possible scenario of Hardware Crypto offload
+
+## Seting up SoftHSM2 to exploit Hardware Crypto and HSM
+
+### Installing dependencies
 OpenSSL cryptographic libraries can be used with the SoftHSM project. I recommend to configured your LinuxONE or IBM Z Linux host with the following guidance [here](https://github.com/guikarai/PE-LinuxONE/blob/master/index.md) in order to be sure that your OpenSSL is backed up with ibmca engine in order to get access to hardware crypto acceleration. Limit yourself to the first chapter about OpenSSL, dm-crypt is not required for the following.
 
-### Installing SoftHSM
+### Installing required packages
 SoftHSM is available from the OpenDNSSEC website, or can be installed thans to the following command:
 ```
 blockchain@blkchn30:~$ sudo apt-get install softhsm2-util softhsm2-common
 ```
 
-### Configure SoftHSM
-Let’s identity together where is the the default location of the config file softhsm2.conf. Please issue the following command:
+### Configuring SoftHSMv2
+1. Let’s identity together where is the the default location of the config file softhsm2.conf. Please issue the following command:
 ```
 blockchain@blkchn30:~$ sudo find / -name softhsm2.conf
 /etc/softhsm/softhsm2.conf
 /usr/share/softhsm/softhsm2.conf
 ```
 
-Let’s now set the SOFTHSM2_CONF environment variable, reusing output of the preceding command. Please issue the following command:
+2. Let’s now set the SOFTHSM2_CONF environment variable, reusing output of the preceding command. Please issue the following command:
 ```
 blockchain@blkchn30:~$ export SOFTHSM2_CONF=/etc/softhsm/softhsm2.conf
 ```
 
-Now, let’s create the token repository folder, please issue the following command:
+3. Now, let’s create the token repository folder, please issue the following command:
 ```
 blockchain@blkchn30:~$ mkdir /var/lib/softhsm/tokens/
 ```
 
-Let’s locate the softhsm pkcs11 library. This will be required later. Please issue the following command:
+4. Let’s locate the softhsm pkcs11 library. This will be required later. Please issue the following command:
 ```
 blockchain@blkchn30:~$ sudo find / -name libsofthsm2.so
 /usr/lib/softhsm/libsofthsm2.so
 ```
 
-### Initialize Soft Token
+### Initializing a Soft Token
 The very first step to use SoftHSM is to use initialize it. We can use the "softhsm2-util" interface to initialize the device. Please procede as follow.
 
 ```
@@ -83,10 +101,10 @@ Slot 253912107
         Label:            ForFabric
 ```
 
-## Hyperledger Fabric, FABRIC CA, HSM and PKCS11
+## Connecting FABRIC CA with SoftHSM2
 
-### Hardware Security Module (HSM)
-By default, the Fabric CA server and client store private keys in a PEM-encoded file, but they can also be configured to store private keys in an HSM (Hardware Security Module) via PKCS11 APIs. 
+### About Fabric CA and Hardware Security Module (HSM)
+By default, the Fabric CA server and client store private keys in a PEM-encoded file, but they can also be configured to store private keys in an HSM (Hardware Security Module) via PKCS11 APIs.
 This behavior is configured in the BCCSP (BlockChain Crypto Service Provider) section of the server’s or client’s configuration file.
 
 ### Configuring Fabric CA server to use softhsm2
