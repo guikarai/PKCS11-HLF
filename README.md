@@ -33,7 +33,7 @@ We can see 3 path to get access to hardware cryptographic devices:
 * EP11 way
 
 You can find here under the easiest one, the ICA way. Note that this is a clear key path and implementation.
-![Image of the Crypto Stack](https://github.com/guikarai/PKCS11-HLF/blob/master/images/Capture%20d%E2%80%99%C3%A9cran%202018-06-21%20%C3%A0%2014.32.40%20(2).png)
+![Image of the Crypto Stack](https://github.com/guikarai/PKCS11-HLF/blob/master/images/Capture%20d%E2%80%99%C3%A9cran%202018-06-21%20%C3%A0%20143240%20(2).png)
 
 ## Seting up SoftHSM2 to exploit Hardware Crypto and HSM
 
