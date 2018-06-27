@@ -35,6 +35,27 @@ We can see 3 path to get access to hardware cryptographic devices:
 You can find here under the easiest one, the ICA way. Note that this is a clear key path and implementation.
 ![Image of the Crypto Stack](https://github.com/guikarai/PKCS11-HLF/blob/master/images/Capture%20d%E2%80%99%C3%A9cran%202018-06-21%20%C3%A0%20143240%20(2).png)
 
+## Seting up Dockers containers to exploit Hardware Crypto and HSM
+
+Containers can be set up to use the mainframe's cryptographic hardware and features.
+
+###CPACF
+If the Docker host has access to CPACF, so do its Docker containers. No special configuration is needed.
+
+#### Random data
+The container needs a device node to access hardware supported random data. Unless your base image already includes this node, create it with the following option of the docker run command:
+```
+--device /dev/prandom:/dev/prandomcopy
+```
+Use the same technique for other device nodes that provide random data.
+
+### Cryptographic adapters or accelerators
+The container needs a device node to access cryptographic adapters or accelerators. Unless the base image already includes this node, create it with the following option of the docker run command:
+```
+--device /dev/z90crypt:/dev/z90cryptcopy
+```
+Through this node, the container can access all cryptographic adapters or accelerators that are available to the host. The container then needs an openCryptoki library and the token that is needed by the cryptographic application. You can use the token configuration to confine the access to a particular cryptographic adapter or accelerator.
+
 ## Seting up SoftHSM2 to exploit Hardware Crypto and HSM
 
 ### Installing dependencies
