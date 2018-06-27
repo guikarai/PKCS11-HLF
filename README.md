@@ -39,8 +39,9 @@ You can find here under the easiest one, the ICA way. Note that this is a clear 
 
 Containers can be set up to use the mainframe's cryptographic hardware and features.
 
-###CPACF
-If the Docker host has access to CPACF, so do its Docker containers. No special configuration is needed.
+### CPACF
+If the Docker host has access to CPACF, so do its Docker containers. 
+No special configuration is needed.
 
 #### Random data
 The container needs a device node to access hardware supported random data. Unless your base image already includes this node, create it with the following option of the docker run command:
